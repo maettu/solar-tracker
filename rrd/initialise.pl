@@ -4,7 +4,7 @@ use Modern::Perl;
 
 # initialise the rrd
 my $rrd_create_stm =
-'rrdtool create test.rrd '.
+'rrdtool create solar.rrd '.
 '--start 1427443580 --step 60 '.
 'DS:watt:GAUGE:10:0:7500 '.
 'RRA:AVERAGE:0.5:6:10512000 '       # 20 years of 1 min points
