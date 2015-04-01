@@ -2,6 +2,7 @@ use Mojolicious::Lite;
 use Mojo::JSON qw (decode_json);
 use DateTime;
 use RRDs;
+use Tie::File;
 
 # write to wherever specified
 sub output ($){
@@ -30,7 +31,14 @@ get '/' => sub {
         );
     }
 
-     $c->render(template=>'main');
+    my $dt = DateTime->now;
+    my $file_name = "../raw_data/".$dt->ymd;
+
+    say "-----";
+    tie my @rows, 'Tie::File', $file_name , mode => 'O_RDONLY' or die $!;
+    my @energies = split /\t/ , $rows[-1];
+
+     $c->render(template=>'main', day_energy=>$energies[2]);
 };
 
 post '/infeed' => sub {
@@ -39,10 +47,22 @@ post '/infeed' => sub {
     my $body = decode_json $c->req->body;
     $body->{Body}{PAC}{Values}{1} =~ /(\d+)/;
     my $watts = $1;
+
+    my %energies;
+    for my $energy ('DAY_ENERGY', 'YEAR_ENERGY', 'TOTAL_ENERGY'){
+        $body->{Body}{$energy}{Values}{1} =~ /(\d+)/;
+        $energies{$energy} = $1;
+    }
+
+    say "day total: $energies{DAY_ENERGY} WH";
+    say "year total: $energies{YEAR_ENERGY} WH";
+    say "installation total: $energies{TOTAL_ENERGY} WH";
+
+
     my $timestamp = time;
     say "$timestamp\t$watts";
     RRDs::update('../rrd/solar.rrd', "$timestamp:$watts");
-    output time."\t$watts";
+    output time."\t$watts\t$energies{DAY_ENERGY}\t$energies{YEAR_ENERGY}\t$energies{TOTAL_ENERGY}";
 
 	$c->res->headers->content_type('application/json; charset=utf-8');
 	$c->render(text => '{"reply":"ok"}');
@@ -55,11 +75,14 @@ __DATA__
 @@ main.html.ep
 
 <h1>My Own Sunshine</h1>
+<h2>Statistics</h2>
+<p>Day Energy: <%= $day_energy %> WH</p>
+
 <h2>1 Day</h2>
-<img src="1d.png" alt="Bild 1 Tag" >
+<img src="1d.png" alt="graph 1 day" >
 <h2>5 Days</h2>
-<img src="5d.png" alt="Bild 5 Tage" >
+<img src="5d.png" alt="graph 5 days" >
 <h2>30 Days</h2>
-<img src="30d.png" alt="Bild 5 Tage" >
+<img src="30d.png" alt="graph 30 days" >
 <h2>365 Days</h2>
-<img src="365d.png" alt="Bild 5 Tage" >
+<img src="365d.png" alt="graph 365 days" >
