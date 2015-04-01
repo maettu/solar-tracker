@@ -5,7 +5,7 @@ use Modern::Perl;
 # initialise the rrd
 my $rrd_create_stm =
 'rrdtool create solar.rrd '.
-'--start 1427443580 --step 60 '.
+'--start 1427443580 --step 10 '.
 'DS:watt:GAUGE:10:0:7500 '.
 'RRA:AVERAGE:0.5:6:10512000 '       # 20 years of 1 min points
 ;
@@ -29,11 +29,11 @@ for my $data_file (sort @data_files){
         $insert_string .= "$timestamp:$watts ";
         if ($counter % 100 == 0){
             say "$timestamp\t$watts";
-            `rrdtool update test.rrd $insert_string`;
+            `rrdtool update solar.rrd $insert_string`;
             $insert_string = "";
         }
     }
 }
 
-`rrdtool update test.rrd $insert_string` unless $insert_string eq "";
+`rrdtool update solar.rrd $insert_string` unless $insert_string eq "";
 
