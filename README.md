@@ -7,9 +7,5 @@ There waits a Perl Mojo server saving information to an rrdtool. Also, it displa
 
 As an example, the push service sends an HTTP POST ever 10 seconds to
 192.168.1.100/infeed.
-The server has two endpoints.
-/infeed
-    saves the data
-/
-    displays the graphs.
+The server has two endpoints. "/infeed" saves the data and "/" displays the graphs.
 
