@@ -38,7 +38,13 @@ get '/' => sub {
     tie my @rows, 'Tie::File', $file_name , mode => 'O_RDONLY' or die $!;
     my @energies = split /\t/ , $rows[-1];
 
-     $c->render(template=>'main', day_energy=>$energies[2]);
+    $c->render(
+        template            => 'main',
+        day_energy          => $energies[2]/1000,
+        year_energy         => $energies[3]/1_000_000,
+        installation_energy => $energies[4]/1_000_000
+
+    );
 };
 
 post '/infeed' => sub {
@@ -76,7 +82,9 @@ __DATA__
 
 <h1>My Own Sunshine</h1>
 <h2>Statistics</h2>
-<p>Day Energy: <%= $day_energy %> WH</p>
+<p>Day Energy: <%= $day_energy %> KWH</p>
+<p>Year Energy: <%= $year_energy %> MWH</p>
+<p>Total Energy: <%= $installation_energy %> MWH</p>
 
 <h2>1 Day</h2>
 <img src="1d.png" alt="graph 1 day" >
