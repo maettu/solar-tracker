@@ -9,3 +9,4 @@ As an example, the push service sends an HTTP POST ever 10 seconds to
 192.168.1.100/infeed.
 The server has two endpoints. "/infeed" saves the data and "/" displays the graphs.
 
+Note: In "raw_data" there is output from the logger written directly to files. This is done for development / debugging reasons. Everything could be done in rrdtool.
