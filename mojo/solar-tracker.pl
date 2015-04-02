@@ -34,8 +34,8 @@ sub write_totals (%){
 
 get '/' => sub {
     my $c = shift;
-    # render images
 
+    # render images
     for my $since (1, 5, 30, 365){
         say "rendering $since";
         RRDs::graph(
@@ -47,6 +47,9 @@ get '/' => sub {
         );
     }
 
+    my $result = RRDs::info('../rrd/solar.rrd');
+    my $current_energy = $result->{'ds[watt].last_ds'};
+
     my $dt = DateTime->now;
     my $file_name = "../raw_data/totals_log/".$dt->ymd;
 
@@ -56,7 +59,7 @@ get '/' => sub {
 
     $c->render(
         template            => 'main',
-        current_energy      => 'tbd', # $energies[1],
+        current_energy      => $current_energy, # $energies[1],
         day_energy          => $energies[0]/1000,
         year_energy         => $energies[1]/1_000_000,
         installation_energy => $energies[2]/1_000_000
