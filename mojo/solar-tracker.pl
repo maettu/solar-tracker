@@ -20,7 +20,11 @@ sub write_totals (%){
     my $dt = DateTime->now;
     my $file_name = "../raw_data/totals_log/".$dt->ymd;
 
-    # make sure only increasing values get written..
+    # make sure only increasing values get written.
+    # This can be important around midnight if logger time
+    # is ahead of time from server system time.
+    # It will then report a day energy of 0, but the server still
+    # writes to "yesterday"
     open my $fh, '<', $file_name;
     my @totals = split  /\t/ , <$fh> // (0,0,0); # first time a day we get here..
     close $fh;
@@ -28,7 +32,6 @@ sub write_totals (%){
         open $fh, '>', $file_name or die $!;
         print $fh "$energies{DAY_ENERGY}\t$energies{YEAR_ENERGY}\t$energies{TOTAL_ENERGY}";
     }
-
 }
 
 
@@ -37,7 +40,6 @@ get '/' => sub {
 
     # render images
     for my $since (1, 5, 30, 365){
-        say "rendering $since";
         RRDs::graph(
             "-N", "--start", "end-${since}d",
             "-w", 1000, "-h", 200,
@@ -52,9 +54,7 @@ get '/' => sub {
 
     my $dt = DateTime->now;
     my $file_name = "../raw_data/totals_log/".$dt->ymd;
-
     open my $fh, '<', $file_name;
-
     my @energies = split /\t/ , <$fh>;
 
     $c->render(
@@ -63,7 +63,6 @@ get '/' => sub {
         day_energy          => $energies[0]/1000,
         year_energy         => $energies[1]/1_000_000,
         installation_energy => $energies[2]/1_000_000
-
     );
 };
 
