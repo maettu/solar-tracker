@@ -80,17 +80,12 @@ post '/infeed' => sub {
         $energies{$energy} = $1;
     }
 
-    say "day total: $energies{DAY_ENERGY} WH";
-    say "year total: $energies{YEAR_ENERGY} WH";
-    say "installation total: $energies{TOTAL_ENERGY} WH";
-
-
-    my $timestamp = time;
-    say "$timestamp\t$watts";
-    RRDs::update('../rrd/solar.rrd', "$timestamp:$watts");
-    output time."\t$watts";
-
-    write_totals %energies;
+    say time."\t$watts";
+    if ($watts > 0) {
+        RRDs::update('../rrd/solar.rrd', time.":$watts");
+        output time."\t$watts";
+        write_totals %energies;
+    }
 
 	$c->render(json => {reply=>'ok'});
 };
