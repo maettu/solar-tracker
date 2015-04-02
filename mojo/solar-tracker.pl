@@ -92,8 +92,8 @@ post '/infeed' => sub {
 
     write_totals %energies;
 
-	$c->res->headers->content_type('application/json; charset=utf-8');
-	$c->render(text => '{"reply":"ok"}');
+#~ 	$c->res->headers->content_type('application/json; charset=utf-8');
+	$c->render(json => {reply=>'ok'});
 };
 
 app->start;
@@ -105,9 +105,9 @@ __DATA__
 <h1>My Own Sunshine</h1>
 <h2>Statistics</h2>
 <p>Current Energy: <%= $current_energy %> W</p>
-<p>Day Energy: <%= $day_energy %> KWH</p>
-<p>Year Energy: <%= $year_energy %> MWH</p>
-<p>Total Energy: <%= $installation_energy %> MWH</p>
+<p>Day Energy: <%= $day_energy %> kWh</p>
+<p>Year Energy: <%= $year_energy %> MWh</p>
+<p>Total Energy: <%= $installation_energy %> MWh</p>
 
 <h2>1 Day</h2>
 <img src="1d.png" alt="graph 1 day" >
