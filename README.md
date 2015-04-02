@@ -10,3 +10,15 @@ As an example, the push service sends an HTTP POST ever 10 seconds to
 The server has two endpoints. "/infeed" saves the data and "/" displays the graphs.
 
 Note: In "raw_data" there is output from the logger written directly to files. This is done for development / debugging reasons. Everything could be done in rrdtool. The data you find in "raw_data" is sample data to give an idea.
+
+bootstrap:
+- register new push service in data logger
+- clone github repo
+- (put data in raw_data/current_energy_log/ if there already is any)
+- cd rrd
+- perl initialise.pl
+- cd ..
+- cd mojo
+- morbo solar-tracker.pl
+- point browser at localhost:3000
+
