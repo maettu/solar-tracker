@@ -14,14 +14,14 @@ my $rrd_create_stm =
 
 # if any, read in stored raw data
 
-opendir my $dh, '../raw_data/' or die $!;
+opendir my $dh, '../raw_data/current_energy_log/' or die $!;
 my @data_files = readdir($dh);
 
 my $counter = 0;
 my $insert_string = "";
 for my $data_file (sort @data_files){
     say $data_file;
-    open my $fh, '<', "../raw_data/$data_file" or die $!;
+    open my $fh, '<', "../raw_data/current_energy_log/$data_file" or die $!;
     while (<$fh>){
         $counter++;
         chomp;

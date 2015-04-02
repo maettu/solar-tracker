@@ -10,7 +10,7 @@ sub output ($){
 
         # determine file to write to
         my $dt = DateTime->now;
-        my $file_name = "../raw_data/".$dt->ymd;
+        my $file_name = "../raw_data/current_energy_log/".$dt->ymd;
         open my $fh, '>>', $file_name or die $!;
         say $fh $data;
 }
@@ -40,6 +40,7 @@ get '/' => sub {
 
     $c->render(
         template            => 'main',
+        current_energy      => $energies[1],
         day_energy          => $energies[2]/1000,
         year_energy         => $energies[3]/1_000_000,
         installation_energy => $energies[4]/1_000_000
@@ -68,7 +69,7 @@ post '/infeed' => sub {
     my $timestamp = time;
     say "$timestamp\t$watts";
     RRDs::update('../rrd/solar.rrd', "$timestamp:$watts");
-    output time."\t$watts\t$energies{DAY_ENERGY}\t$energies{YEAR_ENERGY}\t$energies{TOTAL_ENERGY}";
+    output time."\t$watts";
 
 	$c->res->headers->content_type('application/json; charset=utf-8');
 	$c->render(text => '{"reply":"ok"}');
@@ -82,6 +83,7 @@ __DATA__
 
 <h1>My Own Sunshine</h1>
 <h2>Statistics</h2>
+<p>Current Energy: <%= $current_energy %> W</p>
 <p>Day Energy: <%= $day_energy %> KWH</p>
 <p>Year Energy: <%= $year_energy %> MWH</p>
 <p>Total Energy: <%= $installation_energy %> MWH</p>
