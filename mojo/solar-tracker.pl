@@ -92,7 +92,6 @@ post '/infeed' => sub {
 
     write_totals %energies;
 
-#~ 	$c->res->headers->content_type('application/json; charset=utf-8');
 	$c->render(json => {reply=>'ok'});
 };
 
