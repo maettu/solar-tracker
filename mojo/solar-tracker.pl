@@ -2,7 +2,6 @@ use Mojolicious::Lite;
 use Mojo::JSON qw (decode_json);
 use DateTime;
 use RRDs;
-use Tie::File;
 
 # write to wherever specified
 sub output ($){
@@ -13,6 +12,23 @@ sub output ($){
         my $file_name = "../raw_data/current_energy_log/".$dt->ymd;
         open my $fh, '>>', $file_name or die $!;
         say $fh $data;
+}
+
+sub write_totals (%){
+    my %energies = @_;
+
+    my $dt = DateTime->now;
+    my $file_name = "../raw_data/totals_log/".$dt->ymd;
+
+    # make sure only increasing values get written..
+    open my $fh, '<', $file_name;
+    my @totals = split  /\t/ , <$fh> // (0,0,0); # first time a day we get here..
+    close $fh;
+    if ($energies{DAY_ENERGY} > $totals[0]){
+        open $fh, '>', $file_name or die $!;
+        print $fh "$energies{DAY_ENERGY}\t$energies{YEAR_ENERGY}\t$energies{TOTAL_ENERGY}";
+    }
+
 }
 
 
@@ -32,18 +48,18 @@ get '/' => sub {
     }
 
     my $dt = DateTime->now;
-    my $file_name = "../raw_data/".$dt->ymd;
+    my $file_name = "../raw_data/totals_log/".$dt->ymd;
 
-    say "-----";
-    tie my @rows, 'Tie::File', $file_name , mode => 'O_RDONLY';
-    my @energies = split /\t/ , $rows[-1];
+    open my $fh, '<', $file_name;
+
+    my @energies = split /\t/ , <$fh>;
 
     $c->render(
         template            => 'main',
-        current_energy      => $energies[1],
-        day_energy          => $energies[2]/1000,
-        year_energy         => $energies[3]/1_000_000,
-        installation_energy => $energies[4]/1_000_000
+        current_energy      => 'tbd', # $energies[1],
+        day_energy          => $energies[0]/1000,
+        year_energy         => $energies[1]/1_000_000,
+        installation_energy => $energies[2]/1_000_000
 
     );
 };
@@ -70,6 +86,8 @@ post '/infeed' => sub {
     say "$timestamp\t$watts";
     RRDs::update('../rrd/solar.rrd', "$timestamp:$watts");
     output time."\t$watts";
+
+    write_totals %energies;
 
 	$c->res->headers->content_type('application/json; charset=utf-8');
 	$c->render(text => '{"reply":"ok"}');
