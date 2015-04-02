@@ -35,7 +35,7 @@ get '/' => sub {
     my $file_name = "../raw_data/".$dt->ymd;
 
     say "-----";
-    tie my @rows, 'Tie::File', $file_name , mode => 'O_RDONLY' or die $!;
+    tie my @rows, 'Tie::File', $file_name , mode => 'O_RDONLY';
     my @energies = split /\t/ , $rows[-1];
 
     $c->render(
