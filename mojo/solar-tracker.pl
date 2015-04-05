@@ -34,7 +34,6 @@ sub write_totals (%){
     }
 }
 
-
 get '/' => sub {
     my $c = shift;
 
@@ -43,6 +42,8 @@ get '/' => sub {
         RRDs::graph(
             "-N", "--start", "end-${since}d",
             "-w", 1000, "-h", 200,
+            "-u", 7000,       # specify max to keep scale always the same
+            # "--slope-mode", # wrong, but nice ;-)
             "public/${since}d.png",
             "DEF:solar=../rrd/solar.rrd:watt:AVERAGE",
             "AREA:solar#03bde9"
