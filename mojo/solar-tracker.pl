@@ -170,6 +170,7 @@ __DATA__
 <h2>1 Day</h2>
 <img src="1d.png" alt="graph 1 day" >
 <h2>7 Days</h2>
+<img src="7d.png" alt="graph 7 day" >
 <h2>kWh per day</h2>
 <img src="days_totals.png" alt="totals last 365 days" >
 <h2>kWh per month</h2>
